@@ -1,0 +1,1272 @@
+import React, { useState, useEffect, useCallback } from 'react';
+
+// --- Iconos (AHORA USA IMG CON URLS SVG) ---
+const Icon = ({ src, alt = 'icono', className = '', width = "24", height = "24" }) => (
+  <img
+    src={src}
+    alt={alt}
+    className={`inline-block align-middle ${className}`}
+    width={width}
+    height={height}
+  />
+);
+
+// --- URLs de Iconos Lucide (ejemplos) ---
+const ICONS = {
+  CHEVRON_DOWN: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/chevron-down.svg',
+  CHEVRON_RIGHT: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/chevron-right.svg',
+  SEARCH: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/search.svg',
+  MENU: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/menu.svg',
+  X: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/x.svg',
+  SUN: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/sun.svg',
+  MOON: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/moon.svg',
+  FACEBOOK: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/facebook.svg',
+  TWITTER: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/twitter.svg',
+  LAPTOP: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/laptop.svg',
+  AWARD: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/award.svg',
+  CALENDAR_DAYS: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/calendar-days.svg',
+  MAP: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/map.svg',
+  SCROLL_TEXT: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/scroll-text.svg',
+  USERS_ROUND: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/users-round.svg',
+  WRENCH: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/wrench.svg',
+  GRADUATION_CAP: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/graduation-cap.svg',
+  BOOK_OPEN: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/book-open.svg',
+  USERS: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/users.svg',
+  DOWNLOAD: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/download.svg',
+  LINK: 'https://cdn.jsdelivr.net/npm/lucide-static/icons/link.svg',
+};
+
+
+// --- Datos de Ejemplo ---
+const sampleNews = [
+  {
+    id: 1,
+    slug: 'inscripcion-semestre-2026-1',
+    title: 'Periodo de Inscripción Semestre 2026-1',
+    date: '10 de Mayo, 2025',
+    description: 'Consulta las fechas y el procedimiento para reinscribirte al próximo semestre.',
+    image: 'https://placehold.co/600x300/003366/EBAF00?text=Aviso+Importante',
+    fullContent: `
+      <p >La Dirección General de Administración Escolar (DGAE) ha publicado las fechas oficiales para el proceso de inscripción y reinscripción correspondiente al semestre 2026-1. Se exhorta a toda la comunidad estudiantil a revisar el cronograma detallado y preparar la documentación necesaria con antelación.</p>
+      <p class="mt-4">El proceso se realizará completamente en línea a través del Sistema Integral de Administración Escolar (SIAE). Es fundamental que los estudiantes verifiquen que sus datos de contacto estén actualizados en el sistema para recibir notificaciones importantes.</p>
+      <h3 class="text-xl font-semibold mt-6 mb-2 text-unam-azul dark:text-unam-oro">Fechas Clave:</h3>
+      <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+        <li>Publicación de seriación ideal: 15 de Mayo, 2025</li>
+        <li>Inicio de reinscripciones (según promedio): 20 de Mayo, 2025</li>
+        <li>Fecha límite para aclaraciones: 30 de Mayo, 2025</li>
+        <li>Inicio de semestre: 5 de Agosto, 2025</li>
+      </ul>
+      <p class="mt-4">Para más detalles sobre los requisitos específicos por facultad o escuela, por favor consulte el <a href="#" class="text-unam-oro hover:underline">comunicado oficial de la DGAE</a> o contacte a los servicios escolares de su entidad académica.</p>
+    `
+  },
+  {
+    id: 2,
+    slug: 'convocatoria-beca-manutencion',
+    title: 'Abierta Convocatoria Beca de Manutención',
+    date: '08 de Mayo, 2025',
+    description: 'Revisa los requisitos y postúlate antes de la fecha límite.',
+    image: 'https://placehold.co/600x300/EBAF00/003366?text=Convocatoria+Beca',
+    fullContent: `
+      <p>La Universidad Nacional Autónoma de México, a través de la Dirección General de Orientación y Atención Educativa (DGOAE), convoca a los estudiantes de licenciatura a participar en el proceso de selección para la Beca de Manutención UNAM.</p>
+      <p class="mt-4">Esta beca tiene como objetivo contribuir a asegurar la permanencia y continuación de los estudios de los alumnos de la UNAM que provienen de hogares cuyo ingreso es igual o menor a la línea de bienestar vigente a la fecha de la solicitud.</p>
+      <h3 class="text-xl font-semibold mt-6 mb-2 text-unam-azul dark:text-unam-oro">Requisitos Principales:</h3>
+      <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+        <li>Ser mexicano/a.</li>
+        <li>Estar inscrito/a en un programa de licenciatura de la UNAM.</li>
+        <li>Provenir de un hogar cuyo ingreso mensual per cápita sea igual o menor a la Línea de Pobreza por Ingresos (LPI) urbana.</li>
+        <li>No contar con otra beca para el mismo fin.</li>
+      </ul>
+      <p class="mt-4">La convocatoria completa, así como el sistema de registro, se encuentran disponibles en el <a href="#" class="text-unam-oro hover:underline">portal de Becas UNAM</a>. La fecha límite para el registro de solicitudes es el 15 de Junio de 2025.</p>
+    `
+  },
+  {
+    id: 3,
+    slug: 'descubrimiento-instituto-astronomia',
+    title: 'Nuevo Descubrimiento en el Instituto de Astronomía',
+    date: '05 de Mayo, 2025',
+    description: 'Investigadores de la UNAM identifican un exoplaneta con características únicas.',
+    image: 'https://placehold.co/600x400/cccccc/333333?text=Noticia+IA',
+    fullContent: `
+      <p>Un equipo de científicos del Instituto de Astronomía (IA) de la UNAM ha anunciado el descubrimiento de un nuevo exoplaneta, denominado "Yolotzin-1b", que orbita una estrella enana roja a aproximadamente 300 años luz de la Tierra. El hallazgo fue realizado utilizando datos del Observatorio Astronómico Nacional en San Pedro Mártir.</p>
+      <p class="mt-4">Yolotzin-1b presenta características que lo hacen particularmente interesante para la comunidad científica. Aunque su tamaño es similar al de Neptuno, su densidad sugiere una composición rica en elementos pesados, lo cual es inusual para planetas de su tipo. Además, su órbita es extremadamente corta, completando una vuelta alrededor de su estrella en menos de 2 días terrestres.</p>
+      <h3 class="text-xl font-semibold mt-6 mb-2 text-unam-azul dark:text-unam-oro">Implicaciones del Descubrimiento:</h3>
+      <p class="mt-4">"Este tipo de planetas nos ayuda a entender mejor la diversidad de sistemas planetarios que existen en nuestra galaxia y los procesos de formación planetaria en entornos diferentes al de nuestro Sistema Solar", comentó la Dra. Citlalli Hernández, líder del equipo de investigación.</p>
+      <p class="mt-4">El equipo continuará observando Yolotzin-1b para determinar si posee atmósfera y analizar su composición. Los resultados completos de la investigación serán publicados próximamente en la revista <em class="italic">Astrophysical Journal Letters</em>.</p>
+    `
+  },
+];
+
+const sampleLicenciaturas = [
+  { id: 'actuaria', name: 'Actuaría', area: 'Área I: C. Físico-Matemáticas', sedes: 'Facultad de Ciencias, FES Acatlán' },
+  { id: 'arquitectura', name: 'Arquitectura', area: 'Área IV: Humanidades y Artes', sedes: 'Facultad de Arquitectura, FES Acatlán, FES Aragón' },
+  { id: 'biologia', name: 'Biología', area: 'Área II: C. Biológicas, Químicas y Salud', sedes: 'Facultad de Ciencias, FES Iztacala, FES Zaragoza' },
+  { id: 'comunicacion', name: 'Comunicación', area: 'Área III: Ciencias Sociales', sedes: 'Facultad de Ciencias Políticas y Sociales, FES Acatlán' },
+  { id: 'medicina', name: 'Médico Cirujano', area: 'Área II: C. Biológicas, Químicas y Salud', sedes: 'Facultad de Medicina, FES Iztacala, FES Zaragoza' },
+  { id: 'diseno', name: 'Diseño y Comunicación Visual', area: 'Área IV: Humanidades y Artes', sedes: 'Facultad de Artes y Diseño, FES Cuautitlán' },
+];
+
+const sampleLicenciaturaDetails = {
+  'actuaria': {
+    description: 'Forma profesionales capaces de analizar y modelar fenómenos aleatorios y financieros, aplicando métodos matemáticos y estadísticos para evaluar y administrar riesgos en seguros, pensiones, finanzas y demografía.'
+  },
+  'arquitectura': {
+    description: 'Prepara profesionales con la capacidad de concebir, diseñar y construir espacios habitables funcionales, estéticos y sustentables, integrando aspectos técnicos, sociales, culturales y ambientales.'
+  },
+  'biologia': {
+    description: 'Estudia los seres vivos en sus diversos niveles de organización, desde moléculas hasta ecosistemas. Forma investigadores y profesionales capaces de comprender, conservar y manejar la biodiversidad y sus procesos.'
+  },
+  'comunicacion': {
+    description: 'Forma expertos en el análisis, diseño, gestión y evaluación de procesos de comunicación en diversos ámbitos (medios, organizaciones, política, cultura), con énfasis en la investigación y el uso ético de la información.'
+  },
+  'medicina': {
+    description: 'Prepara médicos generales con sólidos conocimientos científicos, habilidades clínicas, actitud humanista y compromiso social, capaces de diagnosticar, tratar y prevenir enfermedades, promoviendo la salud individual y colectiva.'
+  },
+  'diseno': {
+    description: 'Forma profesionales creativos capaces de conceptualizar, desarrollar y producir soluciones de comunicación visual a través de diversos medios (gráficos, audiovisuales, digitales), respondiendo a necesidades sociales y culturales.'
+  }
+};
+
+const sampleFacultadesEscuelas = [
+  {
+    areaTitle: 'Área I: Ciencias Físico-Matemáticas y de las Ingenierías',
+    items: [
+      { id: 'fac-ciencias-1', name: 'Facultad de Ciencias', url: 'https://www.fciencias.unam.mx/' },
+      { id: 'fac-ingenieria', name: 'Facultad de Ingeniería', url: 'https://www.ingenieria.unam.mx/' },
+      { id: 'fac-quimica-1', name: 'Facultad de Química', url: 'https://quimica.unam.mx/' },
+      { id: 'fes-acatlan-1', name: 'Facultad de Estudios Superiores Acatlán', url: 'https://www.acatlan.unam.mx/' },
+      { id: 'fes-aragon-1', name: 'Facultad de Estudios Superiores Aragón', url: 'https://www.aragon.unam.mx/' },
+      { id: 'fes-cuautitlan-1', name: 'Facultad de Estudios Superiores Cuautitlán', url: 'https://www.cuautitlan.unam.mx/' },
+    ]
+  },
+  {
+    areaTitle: 'Área II: Ciencias Biológicas, Químicas y de la Salud',
+    items: [
+      { id: 'fac-ciencias-2', name: 'Facultad de Ciencias', url: 'https://www.fciencias.unam.mx/' },
+      { id: 'fac-medicina', name: 'Facultad de Medicina', url: 'https://www.facmed.unam.mx/' },
+      { id: 'fac-mvz', name: 'Facultad de Medicina Veterinaria y Zootecnia', url: 'https://www.fmvz.unam.mx/' },
+      { id: 'fac-odontologia', name: 'Facultad de Odontología', url: 'https://www.odonto.unam.mx/' },
+      { id: 'fac-psicologia', name: 'Facultad de Psicología', url: 'https://www.psicologia.unam.mx/' },
+      { id: 'fac-quimica-2', name: 'Facultad de Química', url: 'https://quimica.unam.mx/' },
+      { id: 'enes-leon', name: 'Escuela Nacional de Estudios Superiores Unidad León', url: 'https://enes.unam.mx/leon.html' },
+      { id: 'enes-morelia-2', name: 'Escuela Nacional de Estudios Superiores Unidad Morelia', url: 'https://enes.unam.mx/morelia.html' },
+      { id: 'enes-juriquilla-2', name: 'Escuela Nacional de Estudios Superiores Unidad Juriquilla', url: 'https://enes.unam.mx/juriquilla.html' },
+      { id: 'fes-cuautitlan-2', name: 'Facultad de Estudios Superiores Cuautitlán', url: 'https://www.cuautitlan.unam.mx/' },
+      { id: 'fes-iztacala', name: 'Facultad de Estudios Superiores Iztacala', url: 'https://www.iztacala.unam.mx/' },
+      { id: 'fes-zaragoza', name: 'Facultad de Estudios Superiores Zaragoza', url: 'https://www.zaragoza.unam.mx/' },
+    ]
+  },
+  {
+    areaTitle: 'Área III: Ciencias Sociales',
+    items: [
+      { id: 'fac-cps', name: 'Facultad de Ciencias Políticas y Sociales', url: 'https://www.politicas.unam.mx/' },
+      { id: 'fac-fca', name: 'Facultad de Contaduría y Administración', url: 'https://www.fca.unam.mx/' },
+      { id: 'fac-derecho', name: 'Facultad de Derecho', url: 'https://www.derecho.unam.mx/' },
+      { id: 'fac-economia', name: 'Facultad de Economía', url: 'https://www.economia.unam.mx/' },
+      { id: 'ents', name: 'Escuela Nacional de Trabajo Social', url: 'https://www.trabajosocial.unam.mx/' },
+      { id: 'fes-acatlan-3', name: 'Facultad de Estudios Superiores Acatlán', url: 'https://www.acatlan.unam.mx/' },
+      { id: 'fes-aragon-3', name: 'Facultad de Estudios Superiores Aragón', url: 'https://www.aragon.unam.mx/' },
+    ]
+  },
+  {
+    areaTitle: 'Área IV: Humanidades y de las Artes',
+    items: [
+      { id: 'fac-arquitectura', name: 'Facultad de Arquitectura', url: 'https://www.arquitectura.unam.mx/' },
+      { id: 'fac-artes', name: 'Facultad de Artes y Diseño', url: 'https://www.fad.unam.mx/' },
+      { id: 'fac-filosofia', name: 'Facultad de Filosofía y Letras', url: 'https://www.filos.unam.mx/' },
+      { id: 'fac-musica', name: 'Facultad de Música', url: 'https://www.fam.unam.mx/' },
+      { id: 'enes-morelia-4', name: 'Escuela Nacional de Estudios Superiores Unidad Morelia', url: 'https://enes.unam.mx/morelia.html' },
+      { id: 'enes-juriquilla-4', name: 'Escuela Nacional de Estudios Superiores Unidad Juriquilla', url: 'https://enes.unam.mx/juriquilla.html' },
+      { id: 'fes-acatlan-4', name: 'Facultad de Estudios Superiores Acatlán', url: 'https://www.acatlan.unam.mx/' },
+      { id: 'fes-aragon-4', name: 'Facultad de Estudios Superiores Aragón', url: 'https://www.aragon.unam.mx/' },
+      { id: 'fes-cuautitlan-4', name: 'Facultad de Estudios Superiores Cuautitlán', url: 'https://www.cuautitlan.unam.mx/' },
+    ]
+  },
+  {
+    areaTitle: 'Escuelas Nacionales (Bachillerato y otras)',
+    items: [
+      { id: 'enallt', name: 'Escuela Nacional de Lenguas, Lingüística y Traducción (ENALLT)', url: 'https://enallt.unam.mx/' },
+      { id: 'enes-leon-e', name: 'Escuela Nacional de Estudios Superiores, Unidad León', url: 'https://enes.unam.mx/leon.html' },
+      { id: 'enes-juriquilla-e', name: 'Escuela Nacional de Estudios Superiores, Unidad Juriquilla', url: 'https://enes.unam.mx/juriquilla.html' },
+      { id: 'enes-merida-e', name: 'Escuela Nacional de Estudios Superiores, Unidad Mérida', url: 'https://enes.unam.mx/merida.html' },
+      { id: 'enes-morelia-e', name: 'Escuela Nacional de Estudios Superiores, Unidad Morelia', url: 'https://enes.unam.mx/morelia.html' },
+      { id: 'enp', name: 'Escuela Nacional Preparatoria (ENP)', url: 'https://www.dgenp.unam.mx/' },
+      { id: 'cch', name: 'Colegio de Ciencias y Humanidades (CCH)', url: 'https://www.cch.unam.mx/' },
+    ]
+  },
+];
+
+const academicosLinks = [
+    { id: 'aulas-virtuales', name: 'Aulas Virtuales', url: 'https://www.unamenlinea.unam.mx/pagina/aulas-virtuales', iconSrc: ICONS.LAPTOP },
+    { id: 'becas-estimulos', name: 'Becas y Estímulos Académicos UNAM', url: 'https://dgapa.unam.mx/index.php/estimulos-y-apoyos', iconSrc: ICONS.AWARD },
+    { id: 'calendario-academico', name: 'Calendario Académico', url: 'https://www.escolar.unam.mx/calendarios.html', iconSrc: ICONS.CALENDAR_DAYS },
+    { id: 'estancias-unam', name: 'Estancias UNAM', url: 'https://dgapa.unam.mx/index.php/formacion-academica/superacion-academica/programa-de-estancias-posdoctorales', iconSrc: ICONS.MAP },
+    { id: 'normatividad', name: 'Normatividad', url: 'https://www.abogadogeneral.unam.mx/legislacion-universitaria/', iconSrc: ICONS.SCROLL_TEXT },
+    { id: 'servicios-docencia', name: 'Servicios para Docencia y Tutoría UNAM', url: 'https://www.dgire.unam.mx/web_cssd/', iconSrc: ICONS.USERS_ROUND },
+    { id: 'servicios-generales', name: 'Servicios (Generales para Académicos)', url: 'https://www.unam.mx/academicos/servicios', iconSrc: ICONS.WRENCH },
+];
+
+
+// --- Componentes Reutilizables ---
+const Header = ({ onNavigate, onToggleMenu, onToggleSearch, currentTheme }) => {
+  const [showComunidad, setShowComunidad] = useState(false);
+  const [showOferta, setShowOferta] = useState(false);
+
+  const handleNav = (page) => {
+    setShowComunidad(false);
+    setShowOferta(false);
+    onNavigate(page);
+  };
+
+  return (
+    <header className="bg-unam-azul text-white shadow-md sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+        <button
+          onClick={() => handleNav('home')}
+          aria-label="Página de inicio UNAM"
+          className="focus:outline-none focus:ring-2 focus:ring-unam-oro rounded"
+        >
+          <img
+            src="https://www.unam.mx/assets/images/escudo_unam_f_neg.svg"
+            alt="Logo UNAM"
+            className="h-10 md:h-12"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://placehold.co/150x50/003366/FFFFFF?text=UNAM';
+            }}
+          />
+        </button>
+        <nav className="hidden md:flex space-x-1 items-center text-sm">
+          <button
+            onClick={() => handleNav('home')}
+            className="px-3 py-2 rounded-md hover:text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-unam-oro"
+          >
+            Inicio
+          </button>
+          <div
+            className="relative group"
+            onMouseEnter={() => setShowComunidad(true)}
+            onMouseLeave={() => setShowComunidad(false)}
+          >
+            <button
+              className="px-3 py-2 rounded-md flex items-center hover:text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-unam-oro"
+              aria-haspopup="true"
+            >
+              Comunidad
+              <Icon
+                src={ICONS.CHEVRON_DOWN}
+                alt="desplegar menú comunidad"
+                width="16"
+                height="16"
+                className={`ml-1 transform transition-transform duration-200 ${showComunidad ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {showComunidad && (
+              <div
+                className={`absolute left-0 w-48 ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-md shadow-lg pt-3 pb-1 z-10 transition duration-150 ease-in-out`}
+              >
+                <button
+                  onClick={() => handleNav('alumnos')}
+                  className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-300 hover:bg-unam-oro hover:text-unam-azul' : 'text-gray-700 hover:bg-unam-oro hover:text-unam-azul'}`}
+                >
+                  Alumnos
+                </button>
+                <button
+                  onClick={() => handleNav('academicos')}
+                  className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-300 hover:bg-unam-oro hover:text-unam-azul' : 'text-gray-700 hover:bg-unam-oro hover:text-unam-azul'}`}
+                >
+                  Académicos
+                </button>
+              </div>
+            )}
+          </div>
+          <div
+            className="relative group"
+            onMouseEnter={() => setShowOferta(true)}
+            onMouseLeave={() => setShowOferta(false)}
+          >
+            <button
+              className="px-3 py-2 rounded-md flex items-center hover:text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-unam-oro"
+              aria-haspopup="true"
+            >
+              Oferta Educativa
+              <Icon
+                src={ICONS.CHEVRON_DOWN}
+                alt="desplegar menú oferta educativa"
+                width="16"
+                height="16"
+                className={`ml-1 transform transition-transform duration-200 ${showOferta ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {showOferta && (
+              <div
+                className={`absolute left-0 w-56 ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-md shadow-lg pt-3 pb-1 z-10 transition duration-150 ease-in-out max-h-96 overflow-y-auto`}
+              >
+                <button
+                  onClick={() => handleNav('facultades')}
+                  className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-300 hover:bg-unam-oro hover:text-unam-azul' : 'text-gray-700 hover:bg-unam-oro hover:text-unam-azul'}`}
+                >
+                  Facultades y Escuelas
+                </button>
+                <button
+                  onClick={() => handleNav('oferta')}
+                  className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === 'dark' ? 'text-gray-300 hover:bg-unam-oro hover:text-unam-azul' : 'text-gray-700 hover:bg-unam-oro hover:text-unam-azul'}`}
+                >
+                  Licenciaturas
+                </button>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => handleNav('numeralia')}
+            className="px-3 py-2 rounded-md hover:text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-unam-oro"
+          >
+            Numeralia
+          </button>
+          <button
+            onClick={onToggleSearch}
+            className="px-3 py-2 rounded-md hover:text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-unam-oro"
+            aria-label="Abrir búsqueda"
+          >
+            <Icon src={ICONS.SEARCH} alt="buscar" width="20" height="20" />
+          </button>
+        </nav>
+        <button
+          onClick={onToggleMenu}
+          className="md:hidden focus:outline-none focus:ring-2 focus:ring-unam-oro rounded p-1"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+        >
+          <Icon src={ICONS.MENU} alt="abrir menu" />
+        </button>
+      </div>
+    </header>
+  );
+};
+
+const Footer = ({ onToggleTheme, currentTheme }) => {
+  const year = new Date().getFullYear();
+  const themeIconSrc = currentTheme === 'dark' ? ICONS.SUN : ICONS.MOON;
+
+  const unamFacebookUrl = "https://www.facebook.com/UNAM.MX.Oficial";
+  const unamTwitterUrl = "https://twitter.com/UNAM_MX";
+
+  return (
+    <footer className={`bg-gray-800 ${currentTheme === 'dark' ? 'dark:bg-gray-900' : ''} text-gray-300 dark:text-gray-400 py-8 mt-12`}>
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
+          {/* Enlaces Rápidos */}
+          <div>
+            <h4 className={`text-lg font-semibold ${currentTheme === 'dark' ? 'text-white dark:text-gray-200' : 'text-white'} mb-3`}>
+              Enlaces Rápidos
+            </h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); /* onNavigate('oferta') si es necesario */ }} className="hover:text-unam-oro transition duration-150">
+                  Oferta Académica
+                </a>
+              </li>
+              <li>
+                <a href="#" onClick={(e) => { e.preventDefault(); /* onNavigate('admision') si es necesario */ }} className="hover:text-unam-oro transition duration-150">
+                  Admisión
+                </a>
+              </li>
+              {/* Más enlaces */}
+            </ul>
+          </div>
+
+          {/* Contacto */}
+          <div>
+            <h4 className={`text-lg font-semibold ${currentTheme === 'dark' ? 'text-white dark:text-gray-200' : 'text-white'} mb-3`}>
+              Contacto
+            </h4>
+            <p className="text-sm mb-2">
+              Av. Universidad 3000, Ciudad Universitaria, Coyoacán, C.P. 04510, Ciudad de México.
+            </p>
+            <a href="tel:+525556220000" className="hover:text-unam-oro text-sm block transition duration-150">
+              Teléfono: (55) 5622 0000
+            </a>
+          </div>
+
+          {/* Síguenos */}
+          <div>
+            <h4 className={`text-lg font-semibold ${currentTheme === 'dark' ? 'text-white dark:text-gray-200' : 'text-white'} mb-3`}>
+              Síguenos
+            </h4>
+            <div className="flex space-x-4">
+              <a
+                href={unamFacebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-unam-oro transition duration-150"
+                aria-label="Facebook UNAM"
+              >
+                <Icon src={ICONS.FACEBOOK} alt="Facebook" width="20" height="20" />
+              </a>
+              <a
+                href={unamTwitterUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-unam-oro transition duration-150"
+                aria-label="Twitter UNAM"
+              >
+                <Icon src={ICONS.TWITTER} alt="Twitter" width="20" height="20" />
+              </a>
+            </div>
+          </div>
+
+          {/* Modo Visual */}
+          <div className="text-center md:text-right">
+            <h4 className={`text-lg font-semibold ${currentTheme === 'dark' ? 'text-white dark:text-gray-200' : 'text-white'} mb-3`}>
+              Modo Visual
+            </h4>
+            <button
+              onClick={onToggleTheme}
+              className={`p-2 rounded-md ${currentTheme === 'dark' ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-700 hover:bg-gray-600'} text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-unam-oro`}
+              aria-label="Cambiar tema"
+            >
+              <Icon src={themeIconSrc} alt="cambiar tema" width="20" height="20" />
+            </button>
+          </div>
+        </div>
+
+        <hr className="border-gray-600 dark:border-gray-700 my-6" />
+
+        <div className="text-center text-sm">
+          <p>&copy; {year} Universidad Nacional Autónoma de México. Hecho en México.</p>
+          <p className="text-xs mt-2">Esta página es una propuesta de rediseño con fines académicos.</p>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+const MobileMenu = ({ isOpen, onCloseMenu, onNavigate, onToggleSearch, currentTheme }) => {
+  if (!isOpen) return null;
+
+  const handleNav = (page) => {
+    onNavigate(page);
+    onCloseMenu();
+  };
+
+  return (
+    <nav
+      className={`fixed inset-0 bg-unam-azul bg-opacity-95 ${currentTheme === 'dark' ? 'dark:bg-opacity-95' : ''} backdrop-blur-sm z-40 transform transition-transform duration-300 ease-in-out md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      aria-modal="true"
+      role="dialog"
+    >
+      <div className="container mx-auto px-4 py-6 h-full flex flex-col">
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => handleNav('home')}
+            aria-label="Página de inicio UNAM"
+            className="focus:outline-none focus:ring-2 focus:ring-unam-oro rounded"
+          >
+            <img
+              src="https://www.unam.mx/assets/images/escudo_unam_f_neg.svg"
+              alt="Logo UNAM"
+              className="h-10"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://placehold.co/150x50/003366/FFFFFF?text=UNAM';
+              }}
+            />
+          </button>
+          <button
+            onClick={onCloseMenu}
+            className="focus:outline-none text-white focus:ring-2 focus:ring-unam-oro rounded p-1"
+            aria-label="Cerrar menú"
+          >
+            <Icon src={ICONS.X} alt="cerrar menu" />
+          </button>
+        </div>
+        <div className="flex flex-col space-y-1 text-white text-lg flex-grow overflow-y-auto">
+          <button onClick={() => handleNav('home')} className="text-left hover:text-unam-oro transition duration-200 block py-3 border-b border-white/20 dark:border-gray-700 w-full">Inicio</button>
+          <button onClick={() => handleNav('alumnos')} className="text-left hover:text-unam-oro transition duration-200 block py-3 border-b border-white/20 dark:border-gray-700 w-full">Alumnos</button>
+          <button onClick={() => handleNav('academicos')} className="text-left hover:text-unam-oro transition duration-200 block py-3 border-b border-white/20 dark:border-gray-700 w-full">Académicos</button>
+          <button onClick={() => handleNav('facultades')} className="text-left hover:text-unam-oro transition duration-200 block py-3 border-b border-white/20 dark:border-gray-700 w-full">Facultades y Escuelas</button>
+          <button onClick={() => handleNav('oferta')} className="text-left hover:text-unam-oro transition duration-200 block py-3 border-b border-white/20 dark:border-gray-700 w-full">Licenciaturas</button>
+          <button onClick={() => handleNav('numeralia')} className="text-left hover:text-unam-oro transition duration-200 block py-3 border-b border-white/20 dark:border-gray-700 w-full">Numeralia</button>
+          <button
+            onClick={() => {
+              onToggleSearch();
+              onCloseMenu();
+            }}
+            className={`w-full flex items-center justify-between mt-4 px-4 py-3 rounded-md text-white ${currentTheme === 'dark' ? 'bg-white/5 hover:bg-white/10' : 'bg-white/10 hover:bg-white/20'} focus:outline-none focus:ring-2 focus:ring-unam-oro`}
+          >
+            <span>Buscar en UNAM...</span>
+            <Icon src={ICONS.SEARCH} alt="buscar" width="20" height="20" />
+          </button>
+        </div>
+        <div className="mt-auto pt-4 text-center text-sm text-white/70 dark:text-gray-400">
+          © Universidad Nacional Autónoma de México
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+const SearchOverlay = ({ isOpen, onCloseSearch }) => {
+  const inputRef = React.useRef(null);
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  const handleEscKey = useCallback((event) => {
+    if (event.key === 'Escape') {
+      onCloseSearch();
+    }
+  }, [onCloseSearch]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscKey);
+    } else {
+      document.removeEventListener('keydown', handleEscKey);
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [isOpen, handleEscKey]);
+
+  if (!isOpen) return null;
+
+  const handleContentClick = (e) => {
+    e.stopPropagation();
+  };
+
+  return (
+    <div
+      id="search-overlay"
+      className="fixed inset-0 bg-unam-azul/95 backdrop-blur-sm z-60 flex items-center justify-center p-4"
+      aria-modal="true"
+      role="dialog"
+      onClick={onCloseSearch}
+    >
+      <div className="relative w-full max-w-2xl text-center" onClick={handleContentClick}>
+        <button
+          onClick={onCloseSearch}
+          className="absolute -top-10 right-0 text-white hover:text-unam-oro focus:outline-none cursor-pointer focus:ring-2 focus:ring-unam-oro rounded p-1"
+          aria-label="Cerrar búsqueda"
+        >
+          <Icon src={ICONS.X} alt="cerrar búsqueda" width="32" height="32" />
+        </button>
+        <label htmlFor="overlay-search-input" className="block text-xl md:text-2xl text-white mb-6 font-light">
+          Realiza tu búsqueda
+        </label>
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="search"
+            id="overlay-search-input"
+            name="q"
+            placeholder="Escribe aquí..."
+            className="overlay-search-input w-full text-2xl md:text-4xl focus:outline-none"
+            autoComplete="off"
+          />
+          <span className="absolute right-0 bottom-2 text-white/70 text-2xl md:text-3xl pointer-events-none">
+            <Icon src={ICONS.SEARCH} alt="" width="28" height="28" />
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const NewsCard = ({ newsItem, currentTheme, onNavigate }) => (
+  <article className={`bg-white ${currentTheme === 'dark' ? 'dark:bg-gray-800' : ''} rounded-lg shadow-md dark:shadow-black/30 overflow-hidden flex flex-col`}>
+    <img
+      src={newsItem.image}
+      alt={`Imagen de ${newsItem.title}`}
+      className="w-full h-48 object-cover"
+      onError={(e) => {
+        e.target.onerror = null;
+        e.target.src = 'https://placehold.co/600x400/cccccc/333333?text=Imagen+Rota';
+      }}
+    />
+    <div className="p-6 flex flex-col flex-grow">
+      <span className="text-xs text-gray-500 dark:text-gray-400 mb-1">{newsItem.date}</span>
+      <h3 className={`text-xl font-bold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-unam-azul'} mb-2`}>
+        {newsItem.title}
+      </h3>
+      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 flex-grow">
+        {newsItem.description}
+      </p>
+      <button
+        onClick={() => onNavigate('newsDetail', { slug: newsItem.slug })}
+        className="text-unam-oro font-semibold hover:underline mt-auto self-start text-sm transition duration-150 focus:outline-none focus:ring-1 focus:ring-unam-oro"
+      >
+        Leer más
+        <Icon src={ICONS.CHEVRON_RIGHT} alt="leer más" width="16" height="16" className="ml-1" />
+      </button>
+    </div>
+  </article>
+);
+
+const QuickAccessCard = ({ iconSrc, title, description, onClick, currentTheme, href }) => {
+  const commonProps = `
+    block w-full text-left bg-white 
+    ${currentTheme === 'dark' ? 'dark:bg-gray-800' : ''} 
+    p-6 rounded-lg shadow-md dark:shadow-black/30 
+    hover:shadow-xl transition duration-300 transform hover:-translate-y-1 
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-unam-oro
+  `;
+
+  const content = (
+    <>
+      <Icon src={iconSrc} alt={title} className="text-3xl text-unam-oro mb-3" width="32" height="32" />
+      <h3 className={`text-xl font-bold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-unam-azul'} mb-2`}>
+        {title}
+      </h3>
+      {description && (
+        <p className="text-gray-600 dark:text-gray-400 text-sm">{description}</p>
+      )}
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={commonProps}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button onClick={onClick} className={commonProps}>
+      {content}
+    </button>
+  );
+};
+
+const LicenciaturaCard = ({ licenciatura, onNavigate, currentTheme }) => (
+  <article className={`bg-white ${currentTheme === 'dark' ? 'dark:bg-gray-800' : ''} rounded-lg shadow-md dark:shadow-black/30 overflow-hidden flex flex-col p-6 border-t-4 border-unam-oro`}>
+    <span className="area-tag">{licenciatura.area}</span>
+    <h3 className={`text-xl font-bold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-unam-azul'} mb-2`}>
+      {licenciatura.name}
+    </h3>
+    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+      Se imparte en: {licenciatura.sedes}
+    </p>
+    <button
+      onClick={() => onNavigate('licenciaturaDetail', { id: licenciatura.id })}
+      className="mt-auto self-start bg-unam-oro text-unam-azul text-sm font-bold py-2 px-4 rounded-md hover:bg-yellow-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-unam-oro"
+    >
+      Ver Detalles
+    </button>
+  </article>
+);
+
+const FacultadEscuelaLink = ({ item, currentTheme }) => (
+  <a
+    href={item.url || '#'}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`
+      block w-full text-left p-4 
+      ${currentTheme === 'dark' ? 'bg-gray-800 hover:bg-gray-700 text-gray-100' : 'bg-white hover:bg-gray-50'} 
+      rounded-md shadow hover:shadow-lg transition duration-200 
+      ${currentTheme === 'dark' ? 'dark:text-gray-100 hover:text-unam-oro' : 'text-unam-azul hover:text-unam-oro'} 
+      focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-unam-oro
+    `}
+  >
+    {item.name}
+  </a>
+);
+
+// --- Componentes de Página ---
+const HomePage = ({ onNavigate, currentTheme }) => {
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <section className="mb-12 rounded-lg overflow-hidden shadow-lg dark:shadow-black/30">
+        <div className="relative">
+          <img
+            src="https://cdn.milenio.com/uploads/media/2020/07/21/examen-admision-unam-presencial-bachillerato.jpg"
+            alt="Estudiantes presentando examen de admisión UNAM"
+            className="w-full h-64 md:h-96 object-cover"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://placehold.co/1200x500/003366/EBAF00?text=Campus+UNAM';
+            }}
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-center p-4">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 text-balance">
+              La Universidad de la Nación
+            </h1>
+            <p className="text-lg md:text-xl text-white mb-6 text-balance">
+              Forjando el futuro de México a través del conocimiento.
+            </p>
+            <button
+              onClick={() => onNavigate('oferta')}
+              className="bg-unam-oro text-unam-azul font-bold py-3 px-6 rounded-md hover:bg-yellow-400 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black/50 focus:ring-unam-oro"
+            >
+              Conoce la Oferta Académica
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <h2 className={`text-2xl md:text-3xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mb-6 text-center`}>
+          Accesos Principales
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <QuickAccessCard
+            iconSrc={ICONS.USERS}
+            title="Aspirantes"
+            description="Descubre cómo ser parte de la UNAM."
+            onClick={() => onNavigate('aspirantes')}
+            currentTheme={currentTheme}
+          />
+          <QuickAccessCard
+            iconSrc={ICONS.GRADUATION_CAP}
+            title="Alumnos"
+            description="Servicios, trámites y vida estudiantil."
+            onClick={() => onNavigate('alumnos')}
+            currentTheme={currentTheme}
+          />
+          <QuickAccessCard
+            iconSrc={ICONS.USERS_ROUND}
+            title="Académicos"
+            description="Recursos para docencia e investigación."
+            onClick={() => onNavigate('academicos')}
+            currentTheme={currentTheme}
+          />
+          <QuickAccessCard
+            iconSrc={ICONS.BOOK_OPEN}
+            title="Comunidad"
+            description="Noticias, eventos y más para todos."
+            onClick={() => onNavigate('comunidad')}
+            currentTheme={currentTheme}
+          />
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <h2 className={`text-2xl md:text-3xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mb-6`}>
+          Noticias Recientes
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sampleNews.slice(0, 3).map(news => (
+            <NewsCard
+              key={news.id}
+              newsItem={news}
+              currentTheme={currentTheme}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+};
+
+const AlumnosPage = ({ onNavigate, currentTheme }) => {
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <h1 className={`text-3xl md:text-4xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mb-8 border-b border-unam-oro pb-3`}>
+        Portal Alumnos
+      </h1>
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6">
+          Accesos Rápidos
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <QuickAccessCard
+            iconSrc={ICONS.GRADUATION_CAP}
+            title="Servicios Escolares (DGAE)"
+            description="Trámites, inscripciones, becas y más."
+            href="https://www.dgae.unam.mx/"
+            currentTheme={currentTheme}
+          />
+          <QuickAccessCard
+            iconSrc={ICONS.LAPTOP}
+            title="UNAM en Línea / SUAyED"
+            description="Accede a plataformas y recursos."
+            href="https://www.unamenlinea.unam.mx/"
+            currentTheme={currentTheme}
+          />
+          <QuickAccessCard
+            iconSrc={ICONS.BOOK_OPEN}
+            title="Bibliotecas UNAM"
+            description="Consulta catálogos y bases de datos."
+            href="https://www.bibliotecas.unam.mx/"
+            currentTheme={currentTheme}
+          />
+          <QuickAccessCard
+            iconSrc={ICONS.USERS}
+            title="Tu Comunidad UNAM"
+            description="Correo, almacenamiento y herramientas."
+            href="https://www.tucomunidad.unam.mx/"
+            currentTheme={currentTheme}
+          />
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6">
+          Noticias y Avisos Relevantes
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {sampleNews.slice(0, 2).map(news => (
+            <NewsCard
+              key={news.id}
+              newsItem={news}
+              currentTheme={currentTheme}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <button
+            onClick={() => onNavigate('noticias')}
+            className="bg-unam-azul text-white font-bold py-2 px-5 rounded-md hover:bg-blue-800 dark:hover:bg-blue-700 transition duration-300 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-unam-oro"
+          >
+            Ver todos los avisos
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+};
+
+const OfertaAcademicaPage = ({ onNavigate, currentTheme }) => {
+  const [filterArea, setFilterArea] = useState('Todas');
+
+  const filteredLicenciaturas = sampleLicenciaturas.filter(lic => {
+    if (filterArea === 'Todas') return true;
+    if (filterArea === 'I') return lic.area.startsWith('Área I');
+    if (filterArea === 'II') return lic.area.startsWith('Área II');
+    if (filterArea === 'III') return lic.area.startsWith('Área III');
+    if (filterArea === 'IV') return lic.area.startsWith('Área IV');
+    return false;
+  });
+
+  const FilterButton = ({ area, label }) => (
+    <button
+      onClick={() => setFilterArea(area)}
+      className={`
+        px-4 py-1.5 rounded-md text-sm transition duration-150 
+        focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-unam-oro 
+        ${filterArea === area
+          ? 'bg-unam-azul text-white'
+          : `${currentTheme === 'dark'
+            ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+            : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`
+        }
+      `}
+      aria-pressed={filterArea === area}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <h1 className={`text-3xl md:text-4xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mb-8 border-b border-unam-oro pb-3`}>
+        Oferta Académica (Licenciaturas)
+      </h1>
+      <div className="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filtrar licenciaturas por área">
+        <FilterButton area="Todas" label="Todas las Áreas" />
+        <FilterButton area="I" label="Área I" />
+        <FilterButton area="II" label="Área II" />
+        <FilterButton area="III" label="Área III" />
+        <FilterButton area="IV" label="Área IV" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredLicenciaturas.length > 0 ? (
+          filteredLicenciaturas.map(lic => (
+            <LicenciaturaCard
+              key={lic.id}
+              licenciatura={lic}
+              onNavigate={onNavigate}
+              currentTheme={currentTheme}
+            />
+          ))
+        ) : (
+          <p className={`md:col-span-2 lg:col-span-3 text-center text-gray-500 ${currentTheme === 'dark' ? 'dark:text-gray-400' : ''} mt-8`}>
+            No se encontraron licenciaturas para el área seleccionada.
+          </p>
+        )}
+      </div>
+      {filteredLicenciaturas.length > 10 && (
+        <div className="mt-12 flex justify-center">
+          <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <span className={`relative inline-flex items-center px-4 py-2 border ${currentTheme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'} text-sm font-medium text-gray-500 dark:text-gray-400`}>
+              Paginación (pendiente)
+            </span>
+          </nav>
+        </div>
+      )}
+    </main>
+  );
+};
+
+const LicenciaturaDetailPage = ({ pageParams, onNavigate, currentTheme }) => {
+  const licenciaturaBase = sampleLicenciaturas.find(l => l.id === pageParams?.id);
+  const licenciaturaDetalle = sampleLicenciaturaDetails[pageParams?.id];
+
+  if (!licenciaturaBase) {
+    return (
+      <main className="container mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl text-red-600 dark:text-red-400">Licenciatura no encontrada</h1>
+        <button onClick={() => onNavigate('oferta')} className="mt-4 text-unam-oro hover:underline">
+          Volver a Oferta Académica
+        </button>
+      </main>
+    );
+  }
+
+  const licenciatura = {
+    ...licenciaturaBase,
+    description: licenciaturaDetalle?.description || 'Descripción no disponible.',
+  };
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <nav className="text-sm mb-4" aria-label="Breadcrumb">
+        <ol className="list-none p-0 inline-flex space-x-2 flex-wrap">
+          <li className="flex items-center">
+            <button onClick={() => onNavigate('home')} className="text-unam-azul dark:text-gray-300 hover:text-unam-oro transition duration-150">
+              Inicio
+            </button>
+            <Icon src={ICONS.CHEVRON_RIGHT} alt="separador" width="12" height="12" className="mx-2 text-gray-400 dark:text-gray-500" />
+          </li>
+          <li className="flex items-center">
+            <button onClick={() => onNavigate('oferta')} className="text-unam-azul dark:text-gray-300 hover:text-unam-oro transition duration-150">
+              Oferta Académica
+            </button>
+            <Icon src={ICONS.CHEVRON_RIGHT} alt="separador" width="12" height="12" className="mx-2 text-gray-400 dark:text-gray-500" />
+          </li>
+          <li className="flex items-center">
+            <span className="text-gray-500 dark:text-gray-400 font-medium">{licenciatura.name}</span>
+          </li>
+        </ol>
+      </nav>
+
+      <div className="mb-8 border-b border-unam-oro pb-3">
+        <span className="area-tag">{licenciatura.area}</span>
+        <h1 className={`text-3xl md:text-4xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mt-1`}>
+          {licenciatura.name}
+        </h1>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <section aria-labelledby={`desc-${licenciatura.id}`}>
+            <h2 id={`desc-${licenciatura.id}`} className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-4">
+              Descripción
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              {licenciatura.description}
+            </p>
+          </section>
+          <section aria-labelledby={`plan-${licenciatura.id}`}>
+            <h2 id={`plan-${licenciatura.id}`} className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-4">
+              Plan de Estudios
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Consulta o descarga el plan de estudios oficial.
+            </p>
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center bg-unam-azul text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-800 dark:hover:bg-blue-700 transition duration-300 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-unam-oro"
+            >
+              <Icon src={ICONS.DOWNLOAD} alt="descargar" width="18" height="18" className="mr-2" />
+              Descargar Plan (PDF)
+            </a>
+          </section>
+        </div>
+
+        <aside className="lg:col-span-1 space-y-6">
+          <div className={`bg-white ${currentTheme === 'dark' ? 'dark:bg-gray-800' : ''} p-6 rounded-lg shadow-md dark:shadow-black/30 sticky top-24`}>
+            <h3 className={`text-xl font-bold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-unam-azul'} mb-4 border-b border-gray-300 dark:border-gray-700 pb-2`}>
+              Información Clave
+            </h3>
+            <div className="space-y-3 text-sm">
+              <p>
+                <strong className="text-gray-700 dark:text-gray-300">Sedes:</strong>
+                <span className="text-gray-600 dark:text-gray-400">{licenciatura.sedes}</span>
+              </p>
+            </div>
+            <h3 className={`text-xl font-bold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-unam-azul'} mt-6 mb-4 border-b border-gray-300 dark:border-gray-700 pb-2`}>
+              Enlaces de Interés
+            </h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center text-unam-oro hover:underline hover:text-yellow-500 transition duration-150">
+                  <Icon src={ICONS.LINK} alt="enlace" width="16" height="16" className="mr-2" />
+                  Sitio Web Facultad/Escuela
+                </a>
+              </li>
+              <li>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center text-unam-oro hover:underline hover:text-yellow-500 transition duration-150">
+                  <Icon src={ICONS.LINK} alt="enlace" width="16" height="16" className="mr-2" />
+                  Proceso de Admisión
+                </a>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </main>
+  );
+};
+
+const FacultadesEscuelasPage = ({ onNavigate, currentTheme }) => {
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <h1 className={`text-3xl md:text-4xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mb-8 border-b border-unam-oro pb-3`}>
+        Facultades y Escuelas
+      </h1>
+      {sampleFacultadesEscuelas.map((areaData, index) => (
+        <section key={index} className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6">
+            {areaData.areaTitle}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {areaData.items.map((item) => (
+              <FacultadEscuelaLink
+                key={item.id}
+                item={item}
+                currentTheme={currentTheme}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+    </main>
+  );
+};
+
+const AcademicosPage = ({ onNavigate, currentTheme }) => {
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <h1 className={`text-3xl md:text-4xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mb-8 border-b border-unam-oro pb-3`}>
+        Portal Académicos
+      </h1>
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {academicosLinks.map(link => (
+          <QuickAccessCard
+            key={link.id}
+            iconSrc={link.iconSrc}
+            title={link.name}
+            href={link.url}
+            currentTheme={currentTheme}
+          />
+        ))}
+      </section>
+    </main>
+  );
+};
+
+const NewsDetailPage = ({ pageParams, onNavigate, currentTheme }) => {
+  const newsItem = sampleNews.find(news => news.slug === pageParams?.slug);
+
+  if (!newsItem) {
+    return (
+      <main className="container mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl text-red-600 dark:text-red-400">Noticia no encontrada</h1>
+        <button onClick={() => onNavigate('home')} className="mt-4 text-unam-oro hover:underline">
+          Volver a Inicio
+        </button>
+      </main>
+    );
+  }
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <nav className="text-sm mb-6" aria-label="Breadcrumb">
+        <ol className="list-none p-0 inline-flex space-x-2 flex-wrap">
+          <li className="flex items-center">
+            <button onClick={() => onNavigate('home')} className="text-unam-azul dark:text-gray-300 hover:text-unam-oro transition duration-150">
+              Inicio
+            </button>
+            <Icon src={ICONS.CHEVRON_RIGHT} alt="separador" width="12" height="12" className="mx-2 text-gray-400 dark:text-gray-500" />
+          </li>
+          <li className="flex items-center">
+            <span className="text-gray-500 dark:text-gray-400 font-medium">{newsItem.title}</span>
+          </li>
+        </ol>
+      </nav>
+      <article className={`bg-white ${currentTheme === 'dark' ? 'dark:bg-gray-800' : ''} rounded-lg shadow-lg dark:shadow-black/30 overflow-hidden p-6 md:p-8`}>
+        <img
+          src={newsItem.image}
+          alt={`Imagen de ${newsItem.title}`}
+          className="w-full h-64 md:h-96 object-cover rounded-md mb-6"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://placehold.co/800x400/cccccc/333333?text=Imagen+No+Disponible';
+          }}
+        />
+        <h1 className={`text-3xl md:text-4xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mb-3`}>
+          {newsItem.title}
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          Publicado: {newsItem.date}
+        </p>
+        <div
+          className={`prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed news-content`}
+          dangerouslySetInnerHTML={{ __html: newsItem.fullContent }}
+        />
+      </article>
+    </main>
+  );
+};
+
+// --- Componente Principal App ---
+function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [pageParams, setPageParams] = useState(null);
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return savedTheme || (prefersDark ? 'dark' : 'light');
+  });
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (isMenuOpen || isSearchOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen, isSearchOpen]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => (prevTheme === 'dark' ? 'light' : 'dark'));
+  };
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
+  const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
+  const closeSearch = () => setIsSearchOpen(false);
+
+  const navigate = (page, params = null) => {
+    setCurrentPage(page);
+    setPageParams(params);
+    window.scrollTo(0, 0);
+    closeMenu();
+    closeSearch();
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return <HomePage onNavigate={navigate} currentTheme={theme} />;
+      case 'alumnos':
+        return <AlumnosPage onNavigate={navigate} currentTheme={theme} />;
+      case 'academicos':
+        return <AcademicosPage onNavigate={navigate} currentTheme={theme} />;
+      case 'oferta':
+        return <OfertaAcademicaPage onNavigate={navigate} currentTheme={theme} />;
+      case 'licenciaturaDetail':
+        return <LicenciaturaDetailPage pageParams={pageParams} onNavigate={navigate} currentTheme={theme} />;
+      case 'facultades':
+        return <FacultadesEscuelasPage onNavigate={navigate} currentTheme={theme} />;
+      case 'newsDetail':
+        return <NewsDetailPage pageParams={pageParams} onNavigate={navigate} currentTheme={theme} />;
+      default:
+        return <HomePage onNavigate={navigate} currentTheme={theme} />;
+    }
+  };
+
+  const shouldBlurBackground = isSearchOpen;
+
+  return (
+    <div className={`${theme}`}>
+      <div
+        className={`
+          ${shouldBlurBackground
+            ? 'filter blur-sm brightness-75 transition-all duration-300 ease-in-out pointer-events-none'
+            : 'transition-all duration-300 ease-in-out pointer-events-auto'
+          }
+        `}
+      >
+        <Header
+          onNavigate={navigate}
+          onToggleMenu={toggleMenu}
+          onToggleSearch={toggleSearch}
+          currentTheme={theme}
+        />
+        {renderPage()}
+        <Footer onToggleTheme={toggleTheme} currentTheme={theme} />
+      </div>
+      <MobileMenu
+        isOpen={isMenuOpen}
+        onCloseMenu={closeMenu}
+        onNavigate={navigate}
+        onToggleSearch={toggleSearch}
+        currentTheme={theme}
+      />
+      <SearchOverlay isOpen={isSearchOpen} onCloseSearch={closeSearch} />
+
+      {/* Estilos globales y fuente de iconos */}
+      <style>{`
+        .bg-unam-azul { background-color: #003366; }
+        .text-unam-azul { color: #003366; }
+        .bg-unam-oro { background-color: #EBAF00; }
+        .text-unam-oro { color: #EBAF00; }
+        .border-unam-oro { border-color: #EBAF00; }
+        .hover\\:bg-unam-oro:hover { background-color: #EBAF00; }
+        .hover\\:text-unam-azul:hover { color: #003366; }
+        .hover\\:text-unam-oro:hover { color: #EBAF00; }
+        .focus\\:ring-unam-oro:focus { --tw-ring-color: #EBAF00; }
+        .dark .dark\\:hover\\:bg-unam-oro:hover { background-color: #EBAF00; }
+        .dark .dark\\:hover\\:text-unam-azul:hover { color: #003366; }
+
+        .overlay-search-input {
+          background-color: transparent;
+          border: none;
+          border-bottom: 2px solid white;
+          color: white;
+          outline: none;
+          padding: 0.5rem 0;
+          text-align: center;
+        }
+        .overlay-search-input::placeholder {
+          color: rgba(255, 255, 255, 0.7);
+        }
+        .overlay-search-input:focus {
+          border-bottom-color: #EBAF00;
+        }
+        .area-tag {
+          @apply inline-block text-xs font-semibold text-unam-oro bg-unam-azul/10 dark:bg-unam-oro/20 px-2 py-0.5 rounded mb-3 self-start;
+        }
+        .news-content p {
+          @apply mb-4;
+        }
+        .news-content h3 {
+          @apply text-xl font-semibold mt-6 mb-2 text-unam-azul dark:text-unam-oro;
+        }
+        .news-content ul {
+          @apply list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300;
+        }
+        .news-content a {
+          @apply text-unam-oro hover:underline;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default App;
