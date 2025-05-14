@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import imageUNAM from './assets/imageUNAM.jpg'
 
 // --- Iconos (AHORA USA IMG CON URLS SVG) ---
 const Icon = ({ src, alt = 'icono', className = '', width = "24", height = "24" }) => (
@@ -247,12 +248,17 @@ const Header = ({ onNavigate, onToggleMenu, onToggleSearch, currentTheme }) => {
             onMouseEnter={() => setShowComunidad(true)}
             onMouseLeave={() => setShowComunidad(false)}
           >
-            <button
+            <button 
               className="px-3 py-2 rounded-md flex items-center hover:text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-unam-oro"
               aria-haspopup="true"
-            >
-              Comunidad
-              <Icon
+              onKeyDown={(event) => { 
+                if (event.key === 'Enter') {
+                  setShowComunidad(!showComunidad);
+ 
+ event.preventDefault();
+                }
+              }}
+              >Comunidad<Icon
                 src={ICONS.CHEVRON_DOWN}
                 alt="desplegar menú comunidad"
                 width="16"
@@ -260,7 +266,7 @@ const Header = ({ onNavigate, onToggleMenu, onToggleSearch, currentTheme }) => {
                 className={`ml-1 transform transition-transform duration-200 ${showComunidad ? 'rotate-180' : ''}`}
               />
             </button>
-            {showComunidad && (
+            {showComunidad && ( 
               <div
                 className={`absolute left-0 w-48 ${currentTheme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-md shadow-lg pt-3 pb-1 z-10 transition duration-150 ease-in-out`}
               >
@@ -284,12 +290,17 @@ const Header = ({ onNavigate, onToggleMenu, onToggleSearch, currentTheme }) => {
             onMouseEnter={() => setShowOferta(true)}
             onMouseLeave={() => setShowOferta(false)}
           >
-            <button
+            <button 
               className="px-3 py-2 rounded-md flex items-center hover:text-unam-oro transition duration-200 focus:outline-none focus:ring-2 focus:ring-unam-oro"
               aria-haspopup="true"
-            >
-              Oferta Educativa
-              <Icon
+              onKeyDown={(event) => { 
+                if (event.key === 'Enter') {
+                  setShowOferta(!showOferta);
+ 
+ event.preventDefault();
+                }
+              }}
+              >Oferta Educativa<Icon
                 src={ICONS.CHEVRON_DOWN}
                 alt="desplegar menú oferta educativa"
                 width="16"
@@ -644,7 +655,7 @@ const QuickAccessCard = ({ iconSrc, title, description, onClick, currentTheme, h
 const LicenciaturaCard = ({ licenciatura, onNavigate, currentTheme }) => (
   <article className={`bg-white ${currentTheme === 'dark' ? 'dark:bg-gray-800' : ''} rounded-lg shadow-md dark:shadow-black/30 overflow-hidden flex flex-col p-6 border-t-4 border-unam-oro`}>
     <span className="area-tag">{licenciatura.area}</span>
-    <h3 className={`text-xl font-bold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-unam-azul'} mb-2`}>
+ <h3 className={`text-xl font-bold ${currentTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'} mb-2`}>
       {licenciatura.name}
     </h3>
     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
@@ -683,15 +694,15 @@ const HomePage = ({ onNavigate, currentTheme }) => {
       <section className="mb-12 rounded-lg overflow-hidden shadow-lg dark:shadow-black/30">
         <div className="relative">
           <img
-            src="https://cdn.milenio.com/uploads/media/2020/07/21/examen-admision-unam-presencial-bachillerato.jpg"
+            src={imageUNAM}
             alt="Estudiantes presentando examen de admisión UNAM"
-            className="w-full h-64 md:h-96 object-cover"
+            className="w-full h-64 md:h-96 object-cover opacity-60"
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = 'https://placehold.co/1200x500/003366/EBAF00?text=Campus+UNAM';
+              e.target.src = 'https://via.placeholder.com/1200x500/FF0000/FFFFFF?text=IMAGEN+NO+CARGADA';
             }}
           />
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-center p-4">
+          <div className="absolute inset-0  bg-opacity-50 flex flex-col items-center justify-center text-center p-4">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 text-balance">
               La Universidad de la Nación
             </h1>
@@ -770,7 +781,7 @@ const AlumnosPage = ({ onNavigate, currentTheme }) => {
         Portal Alumnos
       </h1>
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-300 mb-6">
           Accesos Rápidos
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -806,7 +817,7 @@ const AlumnosPage = ({ onNavigate, currentTheme }) => {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-300 mb-6">
           Noticias y Avisos Relevantes
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -947,7 +958,7 @@ const LicenciaturaDetailPage = ({ pageParams, onNavigate, currentTheme }) => {
       </nav>
 
       <div className="mb-8 border-b border-unam-oro pb-3">
-        <span className="area-tag">{licenciatura.area}</span>
+ <span className="area-tag">{licenciatura.area}</span>
         <h1 className={`text-3xl md:text-4xl font-bold ${currentTheme === 'dark' ? 'text-unam-oro' : 'text-unam-azul'} mt-1`}>
           {licenciatura.name}
         </h1>
@@ -1095,7 +1106,7 @@ const NewsDetailPage = ({ pageParams, onNavigate, currentTheme }) => {
       </nav>
       <article className={`bg-white ${currentTheme === 'dark' ? 'dark:bg-gray-800' : ''} rounded-lg shadow-lg dark:shadow-black/30 overflow-hidden p-6 md:p-8`}>
         <img
-          src={newsItem.image}
+          src={newsItem.image} 
           alt={`Imagen de ${newsItem.title}`}
           className="w-full h-64 md:h-96 object-cover rounded-md mb-6"
           onError={(e) => {
@@ -1223,6 +1234,13 @@ function App() {
       {/* Estilos globales y fuente de iconos */}
       <style>{`
         .bg-unam-azul { background-color: #003366; }
+        body {
+          background-color: white; /* Default light mode background */
+          transition: background-color 0.3s ease;
+        }
+        .dark body {
+          background-color: #002244; /* Dark mode background */
+        }
         .text-unam-azul { color: #003366; }
         .bg-unam-oro { background-color: #EBAF00; }
         .text-unam-oro { color: #EBAF00; }
@@ -1249,17 +1267,39 @@ function App() {
         .overlay-search-input:focus {
           border-bottom-color: #EBAF00;
         }
+        
+ .light .news-content p {
+ color: #333; /* Dark gray in light mode */
+ }
+        .news-content li {
+          color: #333 !important; /* Dark gray in light mode */
+        }
+        .dark .news-content li {
+          color: #ccc !important; /* Light gray in dark mode */
+        }
+ h2 {
+ color: #333; /* Dark gray in light mode */
+ }
+ .dark h2 {
+ color: #ccc; /* Light gray in dark mode */
+ }
         .area-tag {
-          @apply inline-block text-xs font-semibold text-unam-oro bg-unam-azul/10 dark:bg-unam-oro/20 px-2 py-0.5 rounded mb-3 self-start;
-        }
+ color: #1a1a1a !important; /* Darker gray in light mode */
+ }
+ .dark .area-tag{
+  color: #cccccc !important;
+ }
         .news-content p {
-          @apply mb-4;
+ @apply mb-4;
         }
-        .news-content h3 {
+ .news-content h3 {
           @apply text-xl font-semibold mt-6 mb-2 text-unam-azul dark:text-unam-oro;
         }
+  .dark .news-content h3{
+        color: #cccccc !important;
+  }
         .news-content ul {
-          @apply list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300;
+ @apply list-disc list-inside space-y-1; /* Keep list styling */
         }
         .news-content a {
           @apply text-unam-oro hover:underline;
