@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import imageUNAM from './assets/imageUNAM.jpg'
+import escudo from './assets/escudo404.png'
 
 // --- Iconos (AHORA USA IMG CON URLS SVG) ---
 const Icon = ({ src, alt = 'icono', className = '', width = "24", height = "24" }) => (
@@ -227,7 +228,7 @@ const Header = ({ onNavigate, onToggleMenu, onToggleSearch, currentTheme }) => {
           className="focus:outline-none focus:ring-2 focus:ring-unam-oro rounded"
         >
           <img
-            src="https://www.unam.mx/assets/images/escudo_unam_f_neg.svg"
+            src= "https://placehold.co/150x50/003366/FFFFFF?text=UNAM"
             alt="Logo UNAM"
             className="h-10 md:h-12"
             onError={(e) => {
@@ -473,7 +474,7 @@ const MobileMenu = ({ isOpen, onCloseMenu, onNavigate, onToggleSearch, currentTh
             className="focus:outline-none focus:ring-2 focus:ring-unam-oro rounded"
           >
             <img
-              src="https://www.unam.mx/assets/images/escudo_unam_f_neg.svg"
+              src="https://placehold.co/150x50/003366/FFFFFF?text=UNAM"
               alt="Logo UNAM"
               className="h-10"
               onError={(e) => {
